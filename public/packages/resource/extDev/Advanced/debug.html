@@ -1,0 +1,18 @@
+<h2>1.yum install gdb安装gdb</h2>
+<h2>2.先修改config.m4</h2>
+在其中加入：
+<div class="codeStyle">
+if test -z "$PHP_DEBUG" ; then
+AC_ARG_ENABLE(debug,
+[--enable-debug compile with debugging system],
+[PHP_DEBUG=$enableval],[PHP_DEBUG=no]
+)
+fi
+</div>
+<h2>3.在扩展目录执行/opt/lampp/bin/phpize</h2>
+<h2>4./configure的时候加入 –enable-debug</h2>
+./configure --with-php-config=/opt/lampp/bin/php-config --enable-debug
+<h2>4.make</h2>
+<h2>5.make install</h2>
+<h2>6.配置php.ini,重启apache</h2>
+<h2>7.在扩展目录执行gdb /opt/lampp/bin/php(指定php的解释器)进入gdb操作空间</h2>

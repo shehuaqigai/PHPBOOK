@@ -1,0 +1,53 @@
+添加函数步骤如下：
+firstExt.h:声明
+<div class="codeStyle">
+PHP_FUNCTION(confirm_hello_compiled);
+</div>
+firstExt.c分注册函数和实现函数，这里是注册函数
+        <div class="codeStyle">
+zend_function_entry hello_functions[] = {
+PHP_FE(confirm_hello_compiled,  NULL)
+PHP_FE(定义函数,NULL)
+};
+        </div>
+        这里是实现函数
+<div class="codeStyle">
+PHP_FUNCTION(定义函数)
+{
+// 这里写函数体
+}
+</div>
+        <span class="red">小知识</span>
+ ---------------------------------------------
+PHP_FUNCTION宏来自ZEND_FUNCTION,ZEND_FUNCTION加参数后就是ZEND_FUNCTION(name)宏
+ZEND_FUNCTION(name)宏来自ZEND_NAMED_FUNCTION(ZEND_FN(name))
+ZEND_NAMED_FUNCTION(name)宏来自void name(INTERNAL_FUNCTION_PARAMETERS)
+ZEND_FN(name)宏来自zif_##name
+ ---------------------------------------------
+<h2>zif是zend internal function的意思，zif_前缀是可供PHP语言调用的函数在C语言中的函数名称前缀。</h2>其中，
+<p class="red">如何开始写扩展函数呢</p>
+用zend_parse_parameters()函数来接收php传递进来的参数
+zend_parse_parameters(int num_args TSRMLS_DC, char *type_spec, …);
+TSRM(Thread Safe Resource Management)线程安全资源管理
+第一个参数是传递给函数的参数个数。通常的做法是传给它ZEND_NUM_ARGS()这是一个表示传递给函数参数总个数的宏。
+第二个参数是为了线程安全，总是传递TSRMLS_CC宏
+第三个参数是一个字符串，指定了函数期望的参数类型
+后面的参数是与第三个参数格式化字符串里的格式一一对应的
+type_spec是格式化字符串也就是第三个参数，其常见的含义如下
+<table><tbody><tr><td>类型指定符</td><td>对应的C类型</td><td>描述</td></tr><tr><td>l</td> <td>long</td><td>符号整数 </td></tr><tr><td>d</td><td>double</td><td>浮点数</td></tr><tr><td>s</td><td>char *, int</td><td>二进制字符串，长度</td></tr><tr><td>b</td><td>zend_bool</td><td>逻辑型（1或0）</td></tr><tr><td>r</td> <td>zval *</td><td>资源（文件指针，数据库连接等）</td></tr><tr><td>a</td> <td>zval *</td> <td>	联合数组 </td></tr><tr><td>o</td><td>zval *</td><td>任何类型的对象 </td></tr><tr><td>O</td><td>zval *</td><td>指定类型的对象。需要提供目标对象的类类型</td></tr><tr><td>z</td><td>zval *</td><td>无任何操作的zval </td></tr><tr><td>f</td><td></td><td>表示函数、方法名称，PHP5.1里貌似木有 </td></tr></tbody></table>
+zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &arg, &arg_len) == FAILURE
+字符串类型要接收字符以及字符的个数
+如果成功就返回SUCCESS
+| – 表明剩下的参数都是可选参数。
+/ – 表明参数解析函数将会对剩下的参数以 SEPARATE_ZVAL_IF_NOT_REF()
+的方式来提供这个参数的一份拷贝， 除非这些参数是一个引用。
+! – 表明剩下的参数允许被设定为 NULL（仅用在a、o、O、r和z身上）。
+
+从PHP函数中返回值
+扩展API包含丰富的用于从函数中返回值的宏。
+这些宏有两种主要风格：第一种是RETVAL_type()形式，它设置了返回值但C代码继续执行。
+这通常使用在把控制交给脚本引擎前还希望做的一些清理工作的时候使用，
+然后再使用C的返回声明 ”return” 返回到PHP；后一个宏更加普遍，其形式是RETURN_type()，
+他设置了返回类型，同时返回控制到PHP。下表解释了大多数存在的宏。
+<table><tbody><tr><td>设置返回值并且结束函数</td><td>设置返回值</td><td>宏返回类型和参数</td></tr><tr><td>RETURN_LONG(l)</td><td>RETVAL_LONG(l)</td><td>整数</td></tr><tr><td>RETURN_BOOL(b)</td><td>RETVAL_BOOL(b)</td><td>布尔数(1或0)</td></tr><tr><td>RETURN_NULL()</td><td>RETVAL_NULL()</td> <td>NULL</td></tr><tr> <td>RETURN_DOUBLE(d)</td> <td>RETVAL_DOUBLE(d)</td> <td>浮点数</td></tr><tr> <td>RETURN_STRING(s, dup)</td> <td>RETVAL_STRING(s, dup)</td> <td>字符串。如果dup为1，引擎会调用estrdup()重复s，使用拷贝。如果dup为0，就使用s</td> </tr> <tr> <td>RETURN_STRINGL(s, l, dup)</td><td>RETVAL_STRINGL(s, l, dup)	</td><td>长度为l的字符串值。与上一个宏一样，但因为s的长度被指定，所以速度更快。</td></tr><tr><td>RETURN_TRUE</td><td>RETVAL_TRUE</td><td>返回布尔值true。注意到这个宏没有括号。</td></tr><tr><td>RETURN_FALSE</td><td>RETVAL_FALSE</td><td>返回布尔值false。注意到这个宏没有括号。 </td></tr> <tr><td>RETURN_RESOURCE(r)</td><td>RETVAL_RESOURCE(r)</td><td>资源句柄。</td> </tr></tbody></table>
+

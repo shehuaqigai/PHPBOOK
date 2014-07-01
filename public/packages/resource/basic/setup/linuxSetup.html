@@ -1,0 +1,12 @@
+解压源代码压缩包: tar -zvxf php-5.5.11.tar.gz
+强制重新生成配置文件configure(不是必要、可选): autoconf -f
+更改脚本的执行权限: chmod 777 configure
+根据configure生成makefile文件: ./configure --enable-debug
+(--enable-debug表示编译时附带GDB调试信息，这样编译出来的版本会比release更大，
+但同时也允许我们用NetBeans这样的工具进行C源码级别的单步调试)
+
+cd /php-5.5.11
+./configure --prefix=/opt/php5.5.11/ --enable-debug --enable-maintainer-zts
+make
+make install
+        如果编译失败，安装各种依赖包

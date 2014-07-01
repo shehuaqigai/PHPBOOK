@@ -1,0 +1,87 @@
+dnl $Id$
+dnl config.m4 for extension firstExt
+<p class="red">firstExt扩展的config.m4配置</p>
+dnl Comments in this file start with the string 'dnl'.
+<p class="red">这个文件的注释是从dnl开始</p>
+dnl Remove where necessary. This file will not work-----(necessary['nesəs(ə)rɪ]必须，必要)
+<p class="red">这个文件是必须的，删除它将不能工作</p>
+dnl without editing.
+<p class="red">没有编辑</p>
+dnl If your extension references something external, use with:
+<p class="red">如果你的扩展引用了外部库就开启PHP_ARG_WITH
+    PHP_ARG_WITH和PHP_ARG_ENABLE指定了PHP模块的工作方式,任选一种
+    PHP_ARG_WITH() 和 PHP_ARG_ENABLE()。这些给 configure 提供了可选项，
+    和在运行 ./configure --help 时显示的帮助文本。
+    就象名称所暗示的，其两者的不同点在于是创建 --with-* 选项还是 --enable-* 选项。
+    每个扩展应提供至少一个以上的选项以及扩展名称，以便用户可选择是否将扩展构建至 PHP 中。
+    按惯例，PHP_ARG_WITH() 用于取得参数的选项，例如扩展所需库或程序的位置；
+    而 PHP_ARG_ENABLE() 用于代表简单标志的选项。不管你使用哪一个指令，你都应该注释掉另外一个。
+    也就是说，如果你使用了–enable-firstExt，那就应该去掉–with-firstExt。反之亦然。
+</p>
+dnl PHP_ARG_WITH(firstExt, for firstExt support,
+dnl Make sure that the comment is aligned:
+dnl [  --with-firstExt             Include firstExt support])
+<span class="red">上面PHP_ARG_ENABLE函数有三个参数，第一个参数是我们的扩展名(注意不用加引号)，
+第二个参数是当我们运行./configure脚本时显示的内容，最后一个参数则是我们在调用./configure --help时显示的帮助信息。</span>
+<p class="red">如果开启就改成
+    PHP_ARG_WITH(firstExt, for firstExt support,
+    Make sure that the comment is aligned:
+    [  --with-firstExt             Include firstExt support])
+</p>
+<p class="red">-----------------------------------------------------------</p>
+
+
+dnl Otherwise use enable:
+<p class="red">否则就开启</p>
+dnl PHP_ARG_ENABLE(firstExt, whether to enable firstExt support,
+dnl Make sure that the comment is aligned:
+dnl [  --enable-firstExt           Enable firstExt support])
+<p class="red">如果开启就改成
+    PHP_ARG_ENABLE(firstExt, whether to enable firstExt support,
+    [  --enable-firstExt           Enable firstExt support])
+</p>
+
+if test "$PHP_FIRSTEXT" != "no"; then  <span class="red">检测扩展是否已启用</span>
+dnl Write more examples of tests here...
+
+dnl # --with-firstExt -> check with-path
+dnl SEARCH_PATH="/usr/local /usr"     # you might want to change this
+dnl SEARCH_FOR="/include/firstExt.h"  # you most likely want to change this
+dnl if test -r $PHP_FIRSTEXT/$SEARCH_FOR; then # path given as parameter
+dnl   FIRSTEXT_DIR=$PHP_FIRSTEXT
+dnl else # search default path list
+dnl   AC_MSG_CHECKING([for firstExt files in default path]) <span class="red">检测 firstExt首先尝试所给出的路径，然后在 $PATH 中寻找</span>
+dnl   for i in $SEARCH_PATH ; do
+dnl     if test -r $i/$SEARCH_FOR; then
+dnl       FIRSTEXT_DIR=$i
+dnl       AC_MSG_RESULT(found in $i)
+dnl     fi
+dnl   done
+dnl fi
+dnl
+dnl if test -z "$FIRSTEXT_DIR"; then
+dnl   AC_MSG_RESULT([not found])
+dnl   AC_MSG_ERROR([Please reinstall the firstExt distribution])
+dnl fi
+
+dnl # --with-firstExt -> add include path
+dnl PHP_ADD_INCLUDE($FIRSTEXT_DIR/include)<span class="red">指定PHP扩展模块用到的头文件目录</span>
+
+dnl # --with-firstExt -> check for lib and symbol presence
+dnl LIBNAME=firstExt # you may want to change this
+dnl LIBSYMBOL=firstExt # you most likely want to change this
+
+dnl PHP_CHECK_LIBRARY($LIBNAME,$LIBSYMBOL, <span class="red">检测扩展库是否工作正常</span>
+dnl [
+dnl   PHP_ADD_LIBRARY_WITH_PATH($LIBNAME, $FIRSTEXT_DIR/lib, FIRSTEXT_SHARED_LIBADD)
+dnl   AC_DEFINE(HAVE_FIRSTEXTLIB,1,[ ])
+dnl ],[
+dnl   AC_MSG_ERROR([wrong firstExt lib version or lib not found])
+dnl ],[
+dnl   -L$FIRSTEXT_DIR/lib -lm
+dnl ])
+dnl
+dnl PHP_SUBST(FIRSTEXT_SHARED_LIBADD) <span class="red">用于说明这个扩展编译成动态链接库的形式</span>
+
+PHP_NEW_EXTENSION(firstExt, firstExt.c, $ext_shared)<span class="red">用于指定有哪些源文件应该被编译,文件和文件之间用空格隔开</span>
+fi

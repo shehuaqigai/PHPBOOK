@@ -1,0 +1,62 @@
+<span class="red">第一步环境和php源码</span>
+搭建php环境(linux,mac,win自己编译或者用集成环境) 推荐用(Xampp,window用easyphp)来学习;
+先去下载php源码<a href="http://cn2.php.net/downloads.php" target="_blank">下载</a>
+<span class="red">第二步生成骨架</span>
+生成扩展骨架进入源码php-5.5.11/ext扩展目录执行
+        <div class="codeStyle">
+./ext_skel --extname=扩展名 --proto=头文件 --skel=生成扩展骨架的skeleton目录
+一般只要给扩展名就可以了./ext_skel --extname=扩展名
+        </div>
+执行后会再ext目录下生成一个扩展目录
+<span class="red">第三步配置config.m4</span>
+切换到扩展目录找到config.m4打开配置
+依赖外面库就开启这个去掉dnl注释就行
+<div class="codeStyle">
+dnl PHP_ARG_WITH(firstExt, for firstExt support,
+dnl Make sure that the comment is aligned:
+dnl [  --with-firstExt             Include firstExt support])
+否则就开启这个去掉dnl的注释    这俩个配置(PHP_AGR_WITH,PHP_ARG_ENABLE)只能开启一个
+dnl Otherwise use enable:
+dnl PHP_ARG_ENABLE(firstExt, whether to enable firstExt support,
+dnl Make sure that the comment is aligned:
+dnl [  --enable-firstExt           Enable firstExt support])
+</div>
+<span class="red">第四步编辑头文件</span>
+找到扩展名.h文件声明头文件
+<div class="codeStyle">
+PHP_FUNCTION(confirm_firstExt_compiled);找到这行这个是内置声明的一个函数，你可以删除
+PHP_FUNCTION(写声明的函数);一个函数一条
+</div>
+<span class="red">第五步编辑实现文件</span>
+找到扩展名.c文件
+<div class="codeStyle">
+    //这里声明函数的参数，每个函数都要声明
+    ZEND_BEGIN_ARG_INFO(firstExt_函数,1)
+    ZEND_ARG_INFO(0, filename)
+    ZEND_ARG_INFO(0, sections_needed)
+    ZEND_END_ARG_INFO()
+ //登记扩展的函数
+const zend_function_entry firstExt_functions[] = {
+PHP_FE(confirm_firstExt_compiled,	NULL)		/* For testing, remove later. */测试后删除内置函数
+PHP_FE(这里注册函数,NULL)  //注册函数表示你这个模块中有这个函数了
+PHP_FE_END	/* Must be the last line in firstExt_functions[] */
+};
+在这里写代码实现跟头文件的声明部分是一样的就是多了实现部分{}
+PHP_FUNCTION(注册函数的实现)
+{
+实现代码段
+}
+</div>
+<span class="red">第六步安装编译</span>
+完成后切换到扩展目录然后用php环境下得phpize命令生成configuare
+   php环境/phpize(要安装m4,autoconf工具才能执行成功)
+然后执行./configure --with-php-config=/opt/lampp/bin/php-config
+这句命令的意思是把这个扩展关联到实际的环境phpconfig中去
+ 然后执行make会在扩展目录下生成一个mouduls目录里面是编译好的扩展名.so文件
+ 你可以复制这个文件到php环境下得扩展目录也可以执行
+   make install 会自动安装到php环境
+   编辑php.ini，把扩展加入进去：
+   在[PHP]模块下增加：
+   extension = 扩展名.so
+<span class="red">第七步测试</span>
+    访问扩展名.php文件测试是否扩展成功

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, target-densitydpi=device-dpi, initial-scale=1, user-scalable=0, maximum-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="shortcut icon" href="<?php echo dirname($_SERVER['SCRIPT_NAME']); ?>/favicon.ico" type="image/x-icon">
+    <link href="<?php echo dirname($_SERVER['SCRIPT_NAME']); ?>/packages/css/custom/reset.css" rel="stylesheet"/>
+    <link href="<?php echo dirname($_SERVER['SCRIPT_NAME']); ?>/packages/css/lib/iconmoon.css" rel="stylesheet"/>
+    <link href="<?php echo dirname($_SERVER['SCRIPT_NAME']); ?>/packages/css/custom/admin.css" rel="stylesheet"/>
+    <title>PHP手册后台管理</title>
+</head>
+<body>
+<?php echo $__env->yieldContent('content'); ?>
+<script src="<?php echo dirname($_SERVER['SCRIPT_NAME']); ?>/packages/js/lib/jquery-2.0.2.js"></script>
+<script src="<?php echo dirname($_SERVER['SCRIPT_NAME']); ?>/packages/js/lib/underscore.js"></script>
+<script src="<?php echo dirname($_SERVER['SCRIPT_NAME']); ?>/packages/js/lib/backbone.js"></script>
+<script src="<?php echo dirname($_SERVER['SCRIPT_NAME']); ?>/packages/js/lib/modernizr.js"></script>
+<script src="<?php echo dirname($_SERVER['SCRIPT_NAME']); ?>/packages/js/lib/iscroll.js"></script>
+<script src="<?php echo dirname($_SERVER['SCRIPT_NAME']); ?>/packages/js/template/adminTemplate.js"></script>
+<script src="<?php echo dirname($_SERVER['SCRIPT_NAME']); ?>/packages/js/model/adminModel.js"></script>
+<script src="<?php echo dirname($_SERVER['SCRIPT_NAME']); ?>/packages/js/view/adminView.js"></script>
+<script src="<?php echo dirname($_SERVER['SCRIPT_NAME']); ?>/packages/js/controller/adminController.js"></script>
+<script src="<?php echo dirname($_SERVER['SCRIPT_NAME']); ?>/packages/js/bootstrap/admin.js"></script>
+</body>
+</html>

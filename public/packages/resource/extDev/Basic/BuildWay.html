@@ -1,0 +1,49 @@
+
+<p class="red">这里的环境为mac系统</p>
+C/C++程序编译有两种方式：动态编译、静态编译。
+PHP 是使用 C/C++程序开发的一门脚本语言，其扩展编译也就脱离不了前面提到的两种，动态、静态。
+站在PHP程序的角度，动态编译就是扩展生成一个 .so 文件，然后在 php.ini 中加载这个 .so 文件，
+此时即可调用其中的函数或者是类方法；静态编译就是在安装 PHP 时把其扩展文件内容编译到 PHP 内部，
+然后不需要做任何事情，就可以直接调用其中的函数或者还是类方法。
+这二者有什么优缺点呢？采用静态编译方式，程序在调用其函数/类方法时要快一些；采用动态编译方式，
+在有新扩展需要添加到PHP中时不需要重新编译PHP，只需要编译该扩展下的文件，然后把 .so 文件引入即可。
+二者均有利弊，使用时视情况而定是最好的方法。下面用mac 平台下的操作来说明其编译过程。
+<p class="red">第一种，动态编译</p>
+1. 在php.net 下载PHP源程序，然后使用其中的扩展骨架生成一个简单的扩展
+cd php-5.5.11/ext    #进入到 php 扩展程序目录
+./ext_skel --extname=firstExt  #生成一个名为firstExt的扩展，也就是在此目录下新增了一个目录firstExt
+2. 修改此扩展配置文件 config.m4
+dnl PHP_ARG_ENABLE(firstExt, whether to enable firstExt support,
+dnl Make sure that the comment is aligned:
+dnl [  --enable-firstExt           Enable firstExt support])
+修改为：
+PPHP_ARG_ENABLE(firstExt, whether to enable firstExt support,
+Make sure that the comment is aligned:
+[  --enable-firstExt           Enable firstExt support])
+3. 开始编译
+apple:ext apple$ /Applications/XAMPP/xamppfiles/bin/phpize
+apple:ext apple$ ./configure --with-php-config=/Applications/XAMPP/xamppfiles/bin/php-config
+apple:ext apple$ make
+注：XAMPP是一个集成php环境如果只想以上命令报错not find之类的参考
+<a href="http://blog.xianpengliu.com/?p=137">Mac 安装m4 autoconf automake libtool</a>解决
+此时在 firstExt/modules 目录里就会生成 firstExt.so。
+4. 配置
+把上一步生成的 firstExt.so 放到  /Applications/XAMPP/xamppfiles/lib/php/extensions/no-debug-non-zts-20121212/中，
+在 php.ini 文件引入此文件。
+你也可以执行make install命令会自动把modules下得firstExt.so复制到生产环境中
+<p class="red">第二种，静态编译</p>
+1. 下载php源程序，生成扩展，如上。
+2. 修改扩展配置文件 config.m4，如上。
+3. 重新生成php程序目录下的 configure 文件
+现在，先让我们执行一下PHP源码根目录下的./configure --help命令。
+会发现输出信息并没有包含我们的扩展，这是因为这个configure脚本生成的时候，我们的扩展还没有编写呢。(这个configure是PHP官方分发的。)，
+所以首先我们需要使用buildconf命令生成新的configure脚本。
+apple:php-5.5.11 apple$ cd php-5.5.11
+apple:php-5.5.11 apple$ rm configure
+apple:php-5.5.11 apple$ ./buildconf --force
+现在当我们再执行./configure --help的时候，便会发现firstExt扩展的信息已经出现了
+现在我们只需要重新走一遍PHP的编译过程，便可以把我们的扩展以静态编译的方式加入到PHP主程序中了
+千万不要忘记使用--enable-firstExt参数开启我们的扩展。
+当然，对于我们学习如何开发PHP扩展来讲，静态编译可不是一个好主意，因为如果采用静态编译的方式，
+只要我们的扩展做了改动，便需要重新编译整个PHP才行，这个过程太痛苦了。
+还是用动态编译吧。但是这种方式有利于提高性能，所以如果我们是在部署生产环境，则可以考虑！

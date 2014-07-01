@@ -1,0 +1,20 @@
+<?php $__env->startSection('content'); ?>
+<div id="container">
+
+
+
+
+
+</div>
+<script>
+    //dom的操作全部交给js来处理
+    var bookData=<?php echo $bookData; ?>;
+    var APP=window.APP || {};
+        APP.M={};
+        APP.C={};
+        APP.V={};
+</script>
+<?php $__env->stopSection(); ?>
+
+
+<?php echo $__env->make('layout', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>

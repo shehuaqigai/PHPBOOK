@@ -1,0 +1,22 @@
+<span class="red">emalloc(size_t size);</span>//分配 size 字节的内存。
+<span class="red">efree(void *ptr);</span>//释放 ptr 指向的缓冲区。缓冲区必须是由 emalloc 分配的
+<span class="red">ecalloc(size_t nmemb, size_t size);</span>//给 nmemb 元素分配 size 字节的缓冲区并初始化为零。
+<span class="red">erealloc(void *ptr, size_t size);</span>//修改使用 emalloc 分配的缓冲区 ptr 的大小为 size 字节
+<span class="red">estrdup(const char *s);</span>//分配一个可存放 NULL 结尾的字符串 s 的缓冲区，并将 s 复制到缓冲区内
+<span class="red">estrndup(const char *s, unsigned int length);</span>//类似于 estrdup，但 NULL 结尾的字符串长度是已知的
+<span class="red">void *safe_emalloc(size_t nmemb, size_t size, size_t offset)</span>//分配缓冲区来存放每块大小为 size 字节的 nmemb 块，并附加 offset 字节。类似于 emalloc(nmemb * size + offset)，但增加了针对溢出的特殊保护。
+------------------------------------------------------------------------------------------
+标准C没有strndup()？”是的，这是正确的，因为GNU扩展通常在Linux下可用。
+estrndup()只是PHP下的一个特殊函数。它的行为与estrdup()相似，
+但是可以指定字符串重复的次数（不需要结束空字符），同时是二进制安全的。
+这是推荐使用estrndup()而不是estrdup()的原因。
+在几乎所有的情况下，你应该使用这些内存分配函数。
+有一些情况，即扩展需要分配在请求中永久存在的内存，从而不得不使用malloc()，
+但是除非你知道你在做什么，你应该始终使用以上的函数。如果没有使用这些内存函数，
+而相反使用标准C函数分配的内存返回给脚本引擎，那么PHP会崩溃。
+这些函数的优点是：任何分配的内存在偶然情况下如果没有被释放，则会在页面请求的最后被释放。
+因此，真正的内存泄漏不会产生。然而，不要依赖这一机制，
+从调试和性能两个原因来考虑，应当确保释放应该释放的内存。
+剩下的优点是在多线程环境下性能的提高，调试模式下检测内存错误等。
+还有一个重要的原因，你不需要检查这些内存分配函数的返回值是否为null。
+当内存分配失败，它们会发出E_ERROR错误，从而决不会返回到扩展。

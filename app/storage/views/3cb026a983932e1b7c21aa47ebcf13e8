@@ -1,0 +1,15 @@
+<?php $__env->startSection('content'); ?>
+<section id="section">
+
+    <form action="./validate" method="post">
+       <p>username:<input type="text" name="userName" placeholder="用户名"/></p>
+       <p>password:<input type="password" name="password" placeholder="密码"/><p>
+        <p><input type="reset" value="重置"/><input type="submit" value="登录"/></p>
+    </form>
+
+
+</section>
+<?php $__env->stopSection(); ?>
+
+
+<?php echo $__env->make('adminLayout', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>

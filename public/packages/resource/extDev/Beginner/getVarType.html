@@ -1,0 +1,44 @@
+PHP在内核中是通过zval这个结构体来存储变量的typedef struct _zval_struct zval;
+_zval_struct中有四个成员变量 zvalue_value value; /* 变量的值 */zend_uint refcount__gc;
+zend_uchar type;    /* 变量当前的数据类型 */zend_uchar is_ref__gc;
+保存变量值的value则是zvalue_value类型(PHP5)，它是一个union，同样定义在了Zend/zend.h文件里：
+<div class="codeStyle">
+    typedef union _zvalue_value {
+    long lval;  /* long value */
+    double dval;    /* double value */
+    struct {
+    char *val;
+    int len;
+    } str;
+    HashTable *ht;  /* hash table value */
+    zend_object_value obj;
+    } zvalue_value;
+</div>
+<h2>在以上实现的基础上，PHP语言得以实现了8种数据类型，这些数据类型在内核中的分别对应于特定的常量，它们分别是：</h2>
+IS_NULL <span class="red">第一次使用的变量如果没有初始化过，则会自动的被赋予这个常量，当然我们也可以在PHP语言中通过null这个常量来给予变量null类型的值。 这个类型的值只有一个 ，就是NULL，它和0与false是不同的。</span>
+
+IS_BOOL <span class="red">布尔类型的变量有两个值，true或者false。在PHP语言中，while、if等语句会自动的把表达式的值转成这个类型的</span>
+
+IS_LONG<span class="red">PHP语言中的整型，在内核中是通过所在操作系统的signed long数据类型来表示的</span>
+
+IS_DOUBLE<span class="red">PHP中的浮点数据是通过C语言中的signed double型变量来存储的， 这最终取决与所在操作系统的浮点型实现</span>
+
+IS_STRING<span class="red">PHP中最常用的数据类型——字符串，在内存中的存储和C差不多， 就是一块能够放下这个变量所有字符的内存，并且在这个变量的zval实现里会保存着指向这块内存的指针</span>
+
+IS_ARRAY<span class="red">数组是一个非常特殊的数据类型，它唯一的功能就是聚集别的变量</span>
+
+IS_OBJECT<span class="red">和数组一样，对象也是用来存储复合数据的，但是与数组不同的是， 对象还需要保存以下信息：方法、访问权限、类常量以及其它的处理逻辑</span>
+
+IS_RESOURCE<span class="red">有一些数据的内容可能无法直接呈现给PHP用户的， 比如与某台mysql服务器的链接，或者直接呈现出来也没有什么意义。 但用户还需要这类数据，因此PHP中提供了一种名为Resource(资源)的数据类型</span>
+
+PHP内核以后可能会修改变量的实现方式，所以检测type的方法可能在以后就不能用了。
+为了解决这个兼容问题，zend头文件中定义了大量的宏，供我们检测、操作变量使用，
+使用这些宏不但让我们的程序更易读，还具有更好的兼容性。 这里我们用Z_TYPE_P()宏来改写上面那个程序。
+<h2>Z_TYPE_P()</h2>//参数是*zval
+<h2>Z_TYPE</h2>//参数是zval型
+<h2>Z_TYPE_PP</h2>//参数则是**zval
+以上三个宏的定义在Zend/zend_operators.h里，定义分别是：
+#define Z_TYPE(zval)        (zval).type
+#define Z_TYPE_P(zval_p)    Z_TYPE(*zval_p)
+#define Z_TYPE_PP(zval_pp)  Z_TYPE(**zval_pp)
+<span class="red">php_printf()函数是内核对printf()函数的一层封装，我们可以像使用printf()函数那样使用它</span>

@@ -1,0 +1,16 @@
+#chapter a{
+    color:red;
+}
+#chapter img{
+    opacity:0.5;
+}
+#chapter .red{
+    color:red;
+}
+#chapter .codeStyle{
+    background:white;
+    color:black;
+    border-radius:0.5rem;
+    padding:0.5rem 0.5rem 3rem 0.5rem;
+}
+

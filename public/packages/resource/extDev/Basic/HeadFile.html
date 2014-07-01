@@ -1,0 +1,89 @@
+/*
++----------------------------------------------------------------------+
+| PHP Version 5                                                        |
++----------------------------------------------------------------------+
+| Copyright (c) 1997-2013 The PHP Group                                |
++----------------------------------------------------------------------+
+| This source file is subject to version 3.01 of the PHP license,      |
+| that is bundled with this package in the file LICENSE, and is        |
+| available through the world-wide-web at the following url:           |
+| http://www.php.net/license/3_01.txt                                  |
+| If you did not receive a copy of the PHP license and are unable to   |
+| obtain it through the world-wide-web, please send a note to          |
+| license@php.net so we can mail you a copy immediately.               |
++----------------------------------------------------------------------+
+| Author:                                                              |
++----------------------------------------------------------------------+
+*/
+
+/* $Id$ */
+
+#ifndef PHP_FIRSTEXT_H
+#define PHP_FIRSTEXT_H
+
+extern zend_module_entry firstExt_module_entry;
+<p class="red">因为一个PHP Extension在C语言层面实际上就是一个zend_module_entry结构体
+ firstExt_module_entry就是firstExt扩展的C语言对应元素，而关于其类型zend_module_entry的定义可以在PHP源代码的
+  “Zend/zend_modules.h”文件里找到
+</p>
+#define phpext_firstExt_ptr &firstExt_module_entry
+
+#define PHP_FIRSTEXT_VERSION "0.1.0" /* Replace with version number for your extension */
+
+#ifdef PHP_WIN32
+#	define PHP_FIRSTEXT_API __declspec(dllexport)
+#elif defined(__GNUC__) && __GNUC__ >= 4
+#	define PHP_FIRSTEXT_API __attribute__ ((visibility("default")))
+#else
+#	define PHP_FIRSTEXT_API
+#endif
+
+#ifdef ZTS
+#include "TSRM.h"
+#endif
+
+PHP_MINIT_FUNCTION(firstExt);
+PHP_MSHUTDOWN_FUNCTION(firstExt);
+PHP_RINIT_FUNCTION(firstExt);
+PHP_RSHUTDOWN_FUNCTION(firstExt);
+PHP_MINFO_FUNCTION(firstExt);
+
+PHP_FUNCTION(confirm_firstExt_compiled);	/* For testing, remove later. */
+
+/*
+Declare any global variables you may need between the BEGIN
+and END macros here:
+
+ZEND_BEGIN_MODULE_GLOBALS(firstExt)
+long  global_value;
+char *global_string;
+ZEND_END_MODULE_GLOBALS(firstExt)
+*/
+
+/* In every utility function you add that needs to use variables
+in php_firstExt_globals, call TSRMLS_FETCH(); after declaring other
+variables used by that function, or better yet, pass in TSRMLS_CC
+after the last function argument and declare your utility function
+with TSRMLS_DC after the last declared argument.  Always refer to
+the globals in your function as FIRSTEXT_G(variable).  You are
+encouraged to rename these macros something shorter, see
+examples in any other php module directory.
+*/
+
+#ifdef ZTS
+#define FIRSTEXT_G(v) TSRMG(firstExt_globals_id, zend_firstExt_globals *, v)
+#else
+#define FIRSTEXT_G(v) (firstExt_globals.v)
+#endif
+
+#endif	/* PHP_FIRSTEXT_H */
+
+
+/*
+* Local variables:
+* tab-width: 4
+* c-basic-offset: 4
+* End:
+* vim600: noet sw=4 ts=4 fdm=marker
+* vim<600: noet sw=4 ts=4
+*/

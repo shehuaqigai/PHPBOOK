@@ -1,0 +1,65 @@
+<h3>当函数要传入1一个以上参数的时候就要在用宏来定义每个函数的参数信息</h3>
+<div class="codeStyle">
+用ZEND_BEGIN_ARG_INFO宏定义开始，以ZEND_END_ARG_INFO()结束；宏定义如下：
+ZEND_BEGIN_ARG_INFO(name, pass_rest_by_reference)：//开始定义参数
+ZEND_END_ARG_INFO() ：
+在这里有几个参数就要写几个宏
+ZEND_END_ARG_INFO()//结束
+</div>
+ZEND_BEGIN_ARG_INFO参数第一个是函数标示符,第二个参数是0和1,1代表传的是引用，0代表普通传递
+<h3>每一个参数的定义可以是下列宏定义中的一个：</h3>
+        <div class="codeStyle">
+            ZEND_ARG_INFO                         声明普通参数
+            ZEND_ARG_OBJ_INFO                 声明对象类型的参数
+            ZEND_ARG_ARRAY_INFO                 声明数组类型的参数
+            ZEND_ARG_PASS_INFO(pass_by_ref)         pass_by_ref为1时，强制设置后续的参数为引用类型
+        </div>
+
+所以对于下面的格式的参数的定义的代码
+<div class="codeStyle">
+ZEND_BEGIN_ARG_INFO(firstExt_hello, 0)
+ZEND_ARG_INFO(0, name)
+ZEND_END_ARG_INFO()
+    </div>
+展开之后的格式如下：
+<div class="codeStyle">
+    static const zend_arg_info arg_user_login[] = {                                                                       /
+    { NULL, 0, NULL, 0, 0, 0, 0, 0, 0 },
+    { "name", sizeof(“name“)-1, NULL, 0, 0, 0, 0, 0, 0 },
+
+    }
+</div>
+可以看到，其实我们定义参数信息展开后就是一个zend_arg_info结构数组，zend_arg_info结构定义如下：
+<div class="codeStyle">
+            typedef struct _zend_arg_info {
+            char *name;
+            zend_uint name_len;
+            char *class_name;
+            zend_uint class_name_len;
+            zend_bool array_type_hint;
+            zend_bool allow_null;
+            zend_bool pass_by_reference;
+            zend_bool return_reference;
+            int required_num_args;
+            } zend_arg_info;
+
+            下面是各个字段的解释：
+            name            参数名称
+            name_len    参数名称字符串长度
+            class_name    当参数类型为类时，指定类名称
+            class_name_len    类名称字符串长度
+            array_type_hint    标识参数类型是否为数组
+            allow_null    是否允许设置为空
+            pass_by_reference    是否设置为引用，即使用&操作符
+            return_reference    标识函数将重写return_value_ptr，后面介绍函数返回值时再做介绍
+            required_num_args    设置函数被调用时，传递参数至少为前N个，当设置为-1时，必须传递所有参数
+        </div>
+还有个就是用PHP_FE将参数与方法绑定起来的格式如下
+<div class="codeStyle">
+    zend_function_entry firstExt_functions[] = {
+    //PHP_FE(confirm_firstExt_compiled,    NULL)        /* For testing, remove later. */
+    PHP_FE(say_hello,firstExt_hello)
+    /* __function_entries_here__ */
+    {NULL, NULL, NULL}    /* Must be the last line in hello_world_functions[] */
+    };
+</div>

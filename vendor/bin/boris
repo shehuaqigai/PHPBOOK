@@ -1,0 +1,27 @@
+#!/usr/bin/env php
+<?php
+
+/* vim: set shiftwidth=2 expandtab softtabstop=2: */
+/**
+“读取-求值-输出”循环（英语：Read-Eval-Print Loop，简称REPL）是一个简单的，
+交互式的编程环境。这个词常常用于指代一个Lisp的交互式开发环境，
+但也能指代命令行的模式和例如 APL, BASIC, Clojure,
+F#, Haskell, J, Julia, Perl, PHP, Prolog, Python, R, Ruby,
+ Scala, Smalltalk, Standard ML, Tcl, Javascript
+ 这样的编程语言所拥有的类似的编程环境。
+ 这也被称做交互式顶层构件（interactive toplevel）。
+ * Chris Corbyn对PHP缺乏一个优良的REPL感到沮丧，所以他创造了Boris我和Chris有着相似的经历。
+Boris 比我的小插件可酷多了。它可以在WordPress之外工作，直接在你的终端模拟器内运行。眼见为实：
+ * 不能在window下工作
+*/
+require_once __DIR__.'/../lib/autoload.php';
+
+$boris  = new \Boris\Boris();
+
+$config = new \Boris\Config();
+$config->apply($boris);
+
+$options = new \Boris\CLIOptionsHandler();
+$options->handle($boris);
+
+$boris->start();

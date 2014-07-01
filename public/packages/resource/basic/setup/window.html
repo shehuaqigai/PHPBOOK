@@ -1,0 +1,53 @@
+<h2>第一步准备工作</h2>
+ 编译环境vc11也就是vs2012(如果要编译5.5+就先安装vs2012,5.4可以用vc9)
+<a href="http://windows.php.net/download/" target="_blank">下载php源码(本次用的是5.5.12)</a>
+<a href="http://www.filewatcher.com/" target="_blank">这里搜索下载bindlib_32.zip,win32build.zip</a>(可选)
+<a href="http://windows.php.net/downloads/php-sdk/" target="_blank">下载php-sdk目前最新的是(php-sdk-binary-tools-20110915.zip)</a>
+<a href="http://windows.php.net/downloads/php-sdk/" target="_blank">下载php的依赖库我这里是(deps-5.5-vc11-x86.7z)</a>
+        这里要说明一下,php5.5+必须要vc11来编译，看你系统是多少位我的是win7,32位系统
+<h2>第二步环境变量设置</h2>
+     我这里已F盘为例
+     理论上php-sdk里已经有bindlib_32.zip,win32build.zip的命令了如果不使用这俩个包能编译成功那是最好
+     在f盘创建winbuild目录把bindlib_32.zip,win32build.zip都解压到这个目录
+     把F:\winbuild\bin加入到环境变量（这个简单，要是不会就有点说不过去了啊）
+     如果不要上面的俩个安装包那就跳过
+<h2>第三部开始编译</h2>
+<a href="https://wiki.php.net/internals/windows/stepbystepbuild" target="_blank">这里是官网的安装步骤，我翻译并实践</a>
+
+    <h3>一.在F盘下创建一个php-src目录，然后把下载的phpsdk(php-sdk-binary-tools-20110915.zip解压到这里)
+        点击开始菜单找到Microsoft Visual Studio2012文件然后点击visual studio Tools里面有一个VS2012 x86 Native Tools Command Prompt项
+        点击打开这个命令终端切换到F:/php-src目录
+        执行bin\phpsdk_setvars.bat(不要切换到F:/php-src/bin下为了保持目录整洁)
+        在执行bin\phpsdk_buildtree.bat phpdev5.5.12
+        完成上面步骤后就会在php-src目录下生成一个phpdev5.5.12目录
+        然后设置环境变量F:/php-src/bin(因为这里有bindlib_32.zip,win32build.zip的命令，如果没下载这俩个包的话)
+
+    </h3>
+        <h3>
+            二.切换到F:/php-src/phpdev5.5.12里面有三个目录vc6,vc8,vc9里面都是空的，复制vc9文件夹然后改名成vc11
+            然后切换到F:/php-src/phpdev5.5.12/vc11里面有俩个目录x86,x64我的系统是32位所以就选择x86
+            切换到F:/php-src/phpdev5.5.12/vc11/x86里面有一个deps目录是空的，把下载下来的依赖包deps-5.5-vc11-x86.7z解压到这个目录
+             跟空的deps合并因为依赖包的文件名也是deps
+            在然后把下载下来的源代码包php-5.5.12-src.zip也解压到这个目录
+        </h3>
+        <h3>
+            三.切换到目录F:/php-src/phpdev5.5.12/vc11/x86/php-5.5.12-src目录
+            运行buildconf
+
+            在运行configure --help
+
+            然后就可以先试着编译php了。最开始，一般编译尽可能少的模块，先让核心能正常编译出来：
+            这一步的主要目的是生成config.w32.h，
+            在运行configure --disable-all --enable-cli
+            将生成main/config.win32.h文件
+
+            然后运行nmake clean
+            在运行  nmake
+            php5.5最核心部分及一个命令行工具就编译出来了。nmake clean是为了避免遗留编译中间结果文件带来干扰。
+
+           这样不出意外的话就编译成功了，如果想编译打包就执行
+            nmake snap
+            如果提示zip.ext找不到可以吧f:/php-src/bin加入到环境变量
+        </h3>
+
+

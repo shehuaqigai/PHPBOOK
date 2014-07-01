@@ -1,0 +1,15 @@
+<?php $__env->startSection('content'); ?>
+<div id="adminPage">
+
+</div>
+<script>
+    //dom的操作全部交给js来处理
+    var ADMIN={};
+        ADMIN.M={};
+        ADMIN.C={};
+        ADMIN.V={};
+</script>
+<?php $__env->stopSection(); ?>
+
+
+<?php echo $__env->make('adminLayout', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>

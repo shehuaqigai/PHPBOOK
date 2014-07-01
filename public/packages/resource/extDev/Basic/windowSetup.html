@@ -1,0 +1,35 @@
+<h2>首先要搭建window的Php编译环境</h2>
+ window的php环境编译参考(php入门)选项下面的安装与配置章节里的window下编译php的文章
+    <h3> 创建扩展firstExtPHP扩展的基础结构相同，为方便开发PHP提供了ext_skel和ext_skel_win32.php
+        分别是linux、windows下的扩展骨架搭建工具。此次讲的是Windows中搭建PHP扩展开发环境，
+        所以使用的是ext_skel_win32.php。用它生成的新扩展骨架，可以直接用VS打开。
+        </h3>
+  <span class="red">注意：</span>在生成骨架之前你先要安装cygwin，因为ext_skel_win32.php是Php脚本，这个
+        脚本最终调用的还是ext_skel的脚本所以要用到里面的sh.exe封装器
+        我的机器上已经安装把,你只要把cygwin/bin配置到环境变量就可以了
+        或者打开ext_skel_win32.php找到里面的$cygwin_path变量把这里的路径设置成你安装的目录
+        我这里是$cygwin_path = 'D:\cygwin\bin';
+
+   <h3>生成骨架</h3>
+        在上面的文章中我们编译了php，我们就用这个php-src目录
+        首先切换到F:\php-src\phpdev5.5.12\vc11\x86\php-5.5.12-src\ext
+        然后运行命令php ext_skel_win32.php --extname=firstExt
+        就会在ext目录下创建一个firstExt扩展目录
+        <span class="red">注意:</span>如果你的集成环境是装在c盘的program Files目录下php的环境配置是集成环境里的php命令
+        你就死翘翘了cygwin无法识别空格(解决办法是不要安装在c盘或者php命令用你自己手动编译的php命令来配置环境变量)
+        完成之后进入扩展目录里面有一个firstExt.dsp文件双击直接可以用vs2012打开
+        为什么要在编译的环境下呢，因为要用到config.w32.h，还有php5ts.lib
+        扩展开发的版本必须要跟php5ts.lib所在的版本要一致你可以吧编译好的Php里的php5ts.lib复制到扩展目录下
+        也可以在vs2012里配置
+<a href="http://blog.csdn.net/a600423444/article/details/8108993" target="_blank">可以参考这里后面部分的vs配置</a>
+        最后你按F5编译扩展成功后会生成一个firstExt.dll
+        然后把这个文件复制到你的集成环境中扩展目录下，然后在php.ini里配置extension=firstExt.dll就可以了
+        然后重启服务器
+        或者执行集成环境里的php -r "echo confirm_firstExt_compiler('test');"如果出现success之类的就说明加载成功了
+        环境搭建好之后，接下来就是开发了跟linux/unix编辑c代码一样
+        当然在window下你也可以用别的编辑器开发只要用vs2012编译器编译就行了
+        <h2>总结</h2>
+        在window上编译和搭建php扩展开发环境是相当痛苦的事情，*nx上没有window那么复杂
+        刚开始会比较痛苦，不过熬过来之后就好了因为项目总是要兼容性这是没办法的事情
+
+

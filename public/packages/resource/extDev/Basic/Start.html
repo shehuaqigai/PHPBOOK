@@ -1,0 +1,132 @@
+二、典型开发流程
+当然了你先要下载php的源码我下的是5.5.11
+linux的环境是xampp1.8.3-4
+一个典型的扩展开发流程如下图：
+<img src="./packages/images/extFlowImage.png" alt="" height="625px"/>
+1. 生成开发骨架
+首先进入源码扩展目录：
+<div class="codeStyle">
+cd 你的路径/php-5.5.11/ext
+</div>
+然后了解下PHP提供的扩展骨架工具ext_skel,ext_skel是生成扩展骨架用的，ext_skel的用法如下：
+<div class="codeStyle">
+./ext_skel --extname=module [--proto=file] [--stubs=file] [--xml[=file]]
+[--skel=dir] [--full-xml] [--no-help]
+--------------------------------------------------------------------------------------------------
+--extname=module module is the name of your extension（模块名，会在当前目录创建一个该名称子目录）
+--proto=file file contains prototypes of functions to create（函数原型定义文件就是头文件）
+--stubs=file generate only function stubs in file
+--xml generate xml documentation to be added to phpdoc-cvs
+--skel=dir path to the skeleton directory(用于生成扩展的骨架目录，不设置该项则默认在ext/skeleton下)
+--full-xml generate xml documentation for a self-contained extension
+(not yet implemented)
+--no-help don't try to be nice and create comments in the code
+and helper functions to test if the module compiled (生成的代码中不显示各种帮助注释)
+-----------------------------------------------------------------------------------------------
+--extname=firstExt 即定义扩展的名称，其实ext_skel是个shell脚本就是生成一个扩展目录
+</div>
+通常来说，开发一个新扩展时，仅需关注的参数是 --extname 和 --no-help。
+除非已经熟悉扩展的结构，不要想去使用 --no-help;
+指定此参数会造成 ext_skel 在生成的文件里省略很多有用的注释。
+剩下的 --extname 会将扩展的名称传给 ext_skel。
+"name" 是一个全为小写字母的标识符，仅包含字母和下划线，在 PHP 发行包的 ext/ 文件夹下是唯一的。
+        我们现在来创建一个扩展首先创建架子
+<div class="codeStyle">
+        ./ext_sekl --extname=firstExt
+</div>
+执行这个命令后会在当前目录下建立一个 项目名 文件夹，这个文件夹内会生成几个文件
+项目名必须是没有空格特殊符号的英文开头的字符串（同时这个也代表了在php内加载后显示的模块名）
+<img src="./packages/images/ext_skel.png" alt="" height="346px"/>
+        然后进入ext/firstExt目录
+<div class="codeStyle">
+        config.m4
+        config.w32
+        CREDITS
+        EXPERIMENTAL
+        firstExt.c
+        firstExt.php
+        php_firstExt.h
+        .svnignore
+        tests
+</div>
+ <h2>配置文件config.m4</h2>
+config.m4:phpize用来准备构建系统哪些扩展的配置文件configure 选项
+是UNIX 构建系统配置。对应的win系统是config.w32:
+config.m4文件负责在配置时解析configure的命令行选项。
+这就是说它将检查所需的外部文件并且要做一些类似配置与安装的任务。
+config.m4 文件告诉 UNIX 构建系统哪些扩展 configure 选项是支持的，
+你需要哪些扩展库，以及哪些源文件要编译成它的一部分。
+对所有经常使用的 autoconf 宏，包括 PHP 特定的及 autoconf 内建的，
+        <p class="red">
+使用vim编辑config.m4, 将16至18行行首的dnl去掉，如下：
+dnl PHP_ARG_ENABLE(firstExt, whether to enable firstExt support,
+dnl Make sure that the comment is aligned:
+dnl [  --enable-firstExt           Enable firstExt support])
+改成
+    PHP_ARG_ENABLE(firstExt, whether to enable firstExt support,
+    [  --enable-firstExt           Enable firstExt support])
+        </p>
+ <h2>php_firstExt.h</h2>
+包含引用的头文件当将扩展作为静态模块构建并放入PHP 二进制包时，
+构建系统要求用 php_ 加扩展的名称命名的 头文件包含一个对扩展模块结构的指针定义。
+就象其他头文件，此文件经常包含附加的宏、原型和全局量。
+当然你可以把头文件内容放在源文件firstExt.c顶部。
+分开只是让代码组织更清晰，而且是个很好的习惯。
+<div class="codeStyle">
+ 在PHP_FUNCTION(confirm_firstExt_compiled);后面声明一个函数
+  PHP_FUNCTION(firstExt_testFunction);
+ 注意扩展中自带了一个confirm_firstExt_compiled方法，这个你可以删除，也可以保留
+    这里声明后再.c文件里实现
+ </div>
+<h2> firstExt.c</h2>
+包含模块函数的源码文件
+扩展应包含任意数量的头文件、源文件
+ //zend_function_entry登记扩展函数
+<div class="codeStyle">
+PHP_FE(firstExt_testFunction,NULL)把这个加入到下面
+
+const zend_function_entry firstExt_functions[] = {
+PHP_FE(confirm_firstExt_compiled,       NULL)           /* For testing, remove later. */
+PHP_FE(firstExt_testFunction,NULL)
+PHP_FE_END      /* Must be the last line in firstExt_functions[] */
+};
+
+//然后在后面实现该函数
+PHP_FUNCTION(firstExt_testFunction){
+//实现代码
+}
+    </div>
+<h2>配置configure脚本</h2>
+完成以上步骤后在项目目录内执行以下命令
+/opt/lampp/bin/phpize这个命令是来自实际的php环境我装的xampp环境
+ <p class="red">
+[root@localhost firstExt]# /opt/lampp/bin/phpize
+Configuring for:
+PHP Api Version:         20121113
+Zend Module Api No:      20121212
+Zend Extension Api No:   220121212
+Cannot find autoconf. Please check your autoconf installation and the
+$PHP_AUTOCONF environment variable. Then, rerun this script.
+ </p>
+ 如果报错就执行
+yum install m4
+yum install autoconf
+/opt/lampp/bin/phpize
+
+这时候会生成好多文件
+<img src="./packages/images/extphpize.png" alt="" height="355px"/>
+
+然后执行./configure --with-php-config=/opt/lampp/bin/php-config
+        这句命令的意思是把这个扩展关联到实际的环境phpconfig中去
+执行 make
+执行make install
+完成后会在/opt/lampp/lib/php/extensions/no-debug-non-zts-20121212/写生成一个firstExt.so文件
+
+编辑php.ini，把扩展加入进去：
+vim /opt/lampp/etc/php.ini
+在[PHP]模块下增加：
+extension = firstExt.so
+
+
+
+

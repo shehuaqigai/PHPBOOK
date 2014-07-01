@@ -1,0 +1,111 @@
+<h2>如何开发面向对象的扩展</h2>
+用php实现类如下:
+<div class="codeStyle">
+class circle
+{
+private  $_x;
+private  $_y;
+private  $_r;
+/**
+* Constructor.
+*/
+public function __construct($x = 0, $y = 0,$r = 5)
+{
+$this->_x = $x;
+$this->_y = $y;
+$this->_r = $r;
+}
+   //生成一个圆
+public function generater()
+{
+}
+
+}
+</div>
+<p class="red">接下来用c扩展来实现</p>
+第一步：建立扩展骨架。
+<div class="codeStyle">
+cd  php-5.5.11/ext
+./ext_skel --extname=firstExt
+</div>
+第二步：修改编译参数。
+<div class="codeStyle">
+cd php-5.5.11/ext/firstExt
+vim config.m4
+去掉
+PHP_ARG_ENABLE(laiwenhui, whether to enable laiwenhui support,
+[ --enable-laiwenhui Enable laiwenhui support])
+两行前面的dnl
+</div>
+第三步：编写代码
+vim php_firstExt.h
+在这里声明类方法
+普通函数是用PHP_FUNCTION,类方法就用PHP_METHOD来声明
+<div class="codeStyle">
+    PHP_METHOD(circle, __construct);//第一个参数是类名,第二个参数是方法名
+    PHP_METHOD(circle,generater);
+</div>
+vim firstExt.c
+声明方法的参数，注册到函数表中
+<div class="codeStyle">
+ZEND_BEGIN_ARG_INFO(arg_construct, 0)    //声明arg_construct构造方法参数，0表示普通传递
+ZEND_ARG_INFO(0, x)
+ZEND_ARG_INFO(0, y)
+ZEND_END_ARG_INFO()
+
+//登记扩展函数
+zend_function_entry firstExt_functions[] = {
+PHP_FE(confirm_firstExt_compiled,      NULL)           /* For testing, remove later. */
+PHP_ME(circle, __construct, arg_construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)//
+PHP_ME(circle, generater, NULL, ZEND_ACC_PUBLIC)
+{NULL, NULL, NULL}      /* Must be the last line in laiwenhui_functions[] */
+};
+//说明:普通函数登记用PHP_FE,类方法用PHP_ME
+</div>
+<p class="red">ZEND_ACC_CTOR表示为构造函数,ZEND_ACC_PUBLIC为访问权限标记，表示public访问权限 </p>
+
+在模块初始化函数中注册并初始化类
+<div class="codeStyle">
+zend_class_entry *circle_ce; //类结构变量
+PHP_MINIT_FUNCTION(firstExt)
+{
+/* If you have INI entries, uncomment these lines
+REGISTER_INI_ENTRIES();
+*/
+zend_class_entry circle;
+INIT_CLASS_ENTRY(circle, "circle", firstExt_functions);//第二个参数为类名，第三个参数为函数表
+circle_ce = zend_register_internal_class_ex(&circle, NULL, NULL TSRMLS_CC);//注册类
+
+ //声明类的成员变量
+zend_declare_property_null(circle_ce , ZEND_STRL("_x"), ZEND_ACC_PRIVATE TSRMLS_CC);//初始化_x属性
+zend_declare_property_null(Vcircle_ce , ZEND_STRL("_y"), ZEND_ACC_PRIVATE TSRMLS_CC);//初始化_y属性
+return SUCCESS;
+}
+</div>
+
+在文件最后面增加具体类方法的实现代码：
+<div class="codeStyle">
+PHP_METHOD(circle, __construct) {
+
+}
+
+PHP_METHOD(circle, generater) {
+
+}
+</div>
+
+第四步：编译代码
+<div class="codeStyle">
+cd php-5.5.11/ext/firstExt
+/opt/lampp/php/bin/phpize
+./configure --with-php-config=/opt/lampp/php/bin/php-config
+make
+make install
+</div>
+编辑PHP配置文件php.ini，添加扩展：
+vim php.ini
+在[PHP]模块下增加：
+extension = firstExt.so
+
+第六步：执行测试代码
+
